@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elegant To-Do List - Professional Task Manager</title>
+    <meta name="description" content="A beautiful and professional to-do list application to manage your tasks efficiently">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, hsl(240 15% 9%), hsl(240 12% 12%));
+            color: hsl(220 20% 95%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 448px;
+            background: linear-gradient(145deg, hsl(240 12% 12%), hsl(240 10% 15%));
+            border: 1px solid hsl(240 8% 25%);
+            border-radius: 12px;
+            box-shadow: 0 8px 32px -8px hsl(240 50% 5% / 0.4);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+        }
+
+        .container:hover {
+            transform: scale(1.01);
+        }
+
+        .header {
+            padding: 32px 32px 0;
+            text-align: center;
+        }
+
+        .title {
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: 0.025em;
+            margin: 0 0 8px 0;
+            color: hsl(220 20% 95%);
+        }
+
+        .counter {
+            color: hsl(220 10% 65%);
+            font-size: 14px;
+            margin: 0;
+        }
+
+        .content {
+            padding: 32px;
+        }
+
+        .input-section {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .task-input {
+            flex: 1;
+            padding: 12px 16px;
+            background: hsl(240 8% 22%);
+            border: 1px solid hsl(240 8% 25%);
+            border-radius: 8px;
+            color: hsl(220 20% 95%);
+            font-size: 16px;
+            outline: none;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .task-input::placeholder {
+            color: hsl(220 10% 65%);
+        }
+
+        .task-input:focus {
+            border-color: hsl(170 75% 41%);
+            box-shadow: 0 0 0 2px hsl(170 75% 41% / 0.2);
+        }
+
+        .add-btn {
+            padding: 12px 16px;
+            background: linear-gradient(135deg, hsl(170 75% 41%), hsl(170 75% 50%));
+            color: hsl(220 20% 95%);
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 22px;  /* Bigger plus */
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 48px;
+            min-height: 48px;
+        }
+
+        .add-btn:hover {
+            box-shadow: 0 0 20px hsl(170 75% 41% / 0.3);
+            transform: translateY(-1px);
+        }
+
+        .add-btn:active {
+            transform: translateY(0);
+        }
+
+        .todo-list {
+            margin-bottom: 24px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 48px 0;
+            color: hsl(220 10% 65%);
+        }
+
+        .empty-icon {
+            width: 48px;
+            height: 48px;
+            border: 2px solid currentColor;
+            border-radius: 50%;
+            margin: 0 auto 16px;
+            opacity: 0.5;
+        }
+
+        .empty-title {
+            font-size: 18px;
+            margin: 0 0 8px 0;
+        }
+
+        .empty-subtitle {
+            font-size: 14px;
+            margin: 0;
+        }
+
+        .todo-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+            margin-bottom: 12px;
+            background: hsl(240 10% 20%);
+            border: 1px solid hsl(240 8% 25% / 0.5);
+            border-radius: 8px;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 8px -2px hsl(240 50% 5% / 0.2);
+            animation: slideUp 0.3s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+        }
+
+        .todo-item:hover {
+            background: hsl(240 8% 25%);
+        }
+
+        .todo-item.completed {
+            opacity: 0.6;
+        }
+
+        .todo-content {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            flex: 1;
+            cursor: pointer;
+        }
+
+        .todo-checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid hsl(220 10% 65%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .todo-item:hover .todo-checkbox {
+            border-color: hsl(170 75% 41%);
+        }
+
+        .todo-checkbox.checked {
+            border-color: hsl(170 75% 41%);
+            background: hsl(170 75% 41%);
+        }
+
+        .todo-checkbox.checked::after {
+            content: "✓";
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .todo-text-wrapper {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .todo-text {
+            color: hsl(220 20% 95%);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 15px;
+        }
+
+        .todo-text.completed {
+            text-decoration: line-through;
+            color: hsl(220 10% 50%);
+        }
+
+        .todo-meta {
+            font-size: 12px;
+            color: hsl(220 10% 60%);
+            margin-top: 4px;
+        }
+
+        .delete-btn {
+            padding: 8px;
+            background: transparent;
+            color: hsl(0 65% 55%);
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            opacity: 0;
+            font-size: 20px;  /* Bigger cross */
+            font-weight: bold;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 36px;
+            min-height: 36px;
+        }
+
+        .todo-item:hover .delete-btn {
+            opacity: 1;
+        }
+
+        .delete-btn:hover {
+            background: hsl(0 65% 55% / 0.1);
+            color: hsl(0 65% 45%);
+        }
+
+        .clear-btn {
+            width: 100%;
+            padding: 12px;
+            background: hsl(0 65% 55%);
+            color: hsl(220 20% 95%);
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .clear-btn:hover {
+            background: hsl(0 65% 45%);
+            box-shadow: 0 4px 12px hsl(0 65% 55% / 0.3);
+        }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: hsl(240 12% 12%);
+            color: hsl(220 20% 95%);
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: 1px solid hsl(240 8% 25%);
+            box-shadow: 0 8px 32px -8px hsl(240 50% 5% / 0.4);
+            transform: translateX(400px);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1000;
+            max-width: 300px;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .toast.success {
+            border-color: hsl(170 75% 41%);
+        }
+
+        .toast.error {
+            border-color: hsl(0 65% 55%);
+        }
+
+        .toast-title {
+            font-weight: 600;
+            margin: 0 0 4px 0;
+            font-size: 14px;
+        }
+
+        .toast-description {
+            margin: 0;
+            font-size: 12px;
+            color: hsl(220 10% 65%);
+        }
+
+        @media (max-width: 480px) {
+            .content {
+                padding: 24px;
+            }
+            
+            .header {
+                padding: 24px 24px 0;
+            }
+            
+            .title {
+                font-size: 24px;
+            }
+            
+            .input-section {
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .add-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="title">📝 My To-Do List</h1>
+            <p class="counter" id="counter" style="display: none;"></p>
+        </div>
+        
+        <div class="content">
+            <div class="input-section">
+                <input type="text" class="task-input" id="taskInput" placeholder="Add a new task...">
+                <button class="add-btn" id="addBtn">+</button>
+            </div>
+            
+            <div class="todo-list" id="todoList">
+                <div class="empty-state" id="emptyState">
+                    <div class="empty-icon"></div>
+                    <p class="empty-title">No tasks yet</p>
+                    <p class="empty-subtitle">Add a task above to get started</p>
+                </div>
+            </div>
+            
+            <button class="clear-btn" id="clearBtn" style="display: none;">Clear All Tasks</button>
+        </div>
+    </div>
+
+    <script>
+        class TodoApp {
+            constructor() {
+                this.todos = [];
+                this.taskInput = document.getElementById('taskInput');
+                this.addBtn = document.getElementById('addBtn');
+                this.todoList = document.getElementById('todoList');
+                this.counter = document.getElementById('counter');
+                this.emptyState = document.getElementById('emptyState');
+                this.clearBtn = document.getElementById('clearBtn');
+
+                this.loadTodos();
+                this.bindEvents();
+                this.render();
+            }
+
+            bindEvents() {
+                this.addBtn.addEventListener('click', () => this.addTodo());
+                this.taskInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') this.addTodo();
+                });
+                this.clearBtn.addEventListener('click', () => this.clearAllTasks());
+            }
+
+            loadTodos() {
+                const savedTodos = localStorage.getItem('todos');
+                if (savedTodos) {
+                    try {
+                        this.todos = JSON.parse(savedTodos).map(todo => ({
+                            ...todo,
+                            createdAt: new Date(todo.createdAt)
+                        }));
+                    } catch (error) {
+                        console.error('Error loading todos:', error);
+                        this.todos = [];
+                    }
+                }
+            }
+
+            saveTodos() {
+                localStorage.setItem('todos', JSON.stringify(this.todos));
+            }
+
+            addTodo() {
+                const text = this.taskInput.value.trim();
+                if (!text) {
+                    this.showToast('Please enter a task', 'Task cannot be empty', 'error');
+                    return;
+                }
+
+                const newTodo = {
+                    id: Date.now().toString(),
+                    text: text,
+                    completed: false,
+                    createdAt: new Date()
+                };
+
+                this.todos.unshift(newTodo);
+                this.taskInput.value = '';
+                this.saveTodos();
+                this.render();
+                this.showToast('Task added', 'Your task has been added successfully', 'success');
+            }
+
+            toggleTodo(id) {
+                const todo = this.todos.find(t => t.id === id);
+                if (todo) {
+                    todo.completed = !todo.completed;
+                    this.saveTodos();
+                    this.render();
+                }
+            }
+
+            removeTodo(id) {
+                const index = this.todos.findIndex(t => t.id === id);
+                if (index !== -1) {
+                    const todoItem = document.querySelector(`[data-id="${id}"]`);
+                    if (todoItem) {
+                        todoItem.style.animation = 'slideDown 0.2s ease-out forwards';
+                        setTimeout(() => {
+                            this.todos.splice(index, 1);
+                            this.saveTodos();
+                            this.render();
+                            this.showToast('Task removed', 'Your task has been deleted', 'success');
+                        }, 200);
+                    }
+                }
+            }
+
+            clearAllTasks() {
+                if (this.todos.length === 0) return;
+                
+                if (confirm('Are you sure you want to clear all tasks?')) {
+                    this.todos = [];
+                    this.saveTodos();
+                    this.render();
+                    this.showToast('All tasks cleared', 'Your task list has been cleared', 'success');
+                }
+            }
+
+            render() {
+                const completedCount = this.todos.filter(todo => todo.completed).length;
+                const totalCount = this.todos.length;
+
+                // Update counter
+                if (totalCount > 0) {
+                    this.counter.textContent = `${completedCount} of ${totalCount} tasks completed`;
+                    this.counter.style.display = 'block';
+                    this.clearBtn.style.display = 'block';
+                } else {
+                    this.counter.style.display = 'none';
+                    this.clearBtn.style.display = 'none';
+                }
+
+                // Clear todo list
+                this.todoList.innerHTML = '';
+
+                if (totalCount === 0) {
+                    this.todoList.appendChild(this.emptyState);
+                } else {
+                    this.todos.forEach((todo, index) => {
+                        const todoItem = this.createTodoElement(todo, index);
+                        this.todoList.appendChild(todoItem);
+                    });
+                }
+            }
+
+            createTodoElement(todo, index) {
+                const item = document.createElement('div');
+                item.className = `todo-item ${todo.completed ? 'completed' : ''}`;
+                item.setAttribute('data-id', todo.id);
+                item.style.animationDelay = `${index * 50}ms`;
+
+                item.innerHTML = `
+                    <div class="todo-content">
+                        <div class="todo-checkbox ${todo.completed ? 'checked' : ''}"></div>
+                        <div class="todo-text-wrapper">
+                            <span class="todo-text ${todo.completed ? 'completed' : ''}">
+                                ${this.escapeHtml(todo.text)}
+                            </span>
+                            <div class="todo-meta">${this.formatDate(todo.createdAt)}</div>
+                        </div>
+                    </div>
+                    <button class="delete-btn">×</button>
+                `;
+
+                // Add event listeners
+                const content = item.querySelector('.todo-content');
+                const deleteBtn = item.querySelector('.delete-btn');
+
+                content.addEventListener('click', () => this.toggleTodo(todo.id));
+                deleteBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.removeTodo(todo.id);
+                });
+
+                return item;
+            }
+
+            escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+
+            formatDate(date) {
+                const options = {
+                    day: '2-digit',
+                    month: 'short',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: true
+                };
+                return new Date(date).toLocaleString(undefined, options);
+            }
+
+            showToast(title, description, type = 'success') {
+                // Remove existing toasts
+                const existingToasts = document.querySelectorAll('.toast');
+                existingToasts.forEach(toast => toast.remove());
+
+                const toast = document.createElement('div');
+                toast.className = `toast ${type}`;
+                toast.innerHTML = `
+                    <div class="toast-title">${title}</div>
+                    <div class="toast-description">${description}</div>
+                `;
+
+                document.body.appendChild(toast);
+
+                // Show toast
+                setTimeout(() => toast.classList.add('show'), 10);
+
+                // Hide toast after 3 seconds
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                    setTimeout(() => toast.remove(), 300);
+                }, 3000);
+            }
+        }
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', () => {
+            new TodoApp();
+        });
+    </script>
+</body>
+</html>
